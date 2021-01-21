@@ -4,6 +4,7 @@
 #include "base.hpp"
 #include "mapi.hpp"
 #include "rdi.hpp"
+#include "LevelSetup.h"
 
 using namespace std;
 
@@ -20,6 +21,8 @@ class FunctionalTest : public Base {
   int _processResults;
   string _pattern;
   string _testNameOverride;
+  LevelSetup* _lvlSet;
+  bool _lvlSetup_defined;
 
  public:
   FunctionalTest();
@@ -33,7 +36,9 @@ class FunctionalTest : public Base {
   FunctionalTest& processResults(int v);
   FunctionalTest& pattern(string v);
   FunctionalTest& testName(string v);
-
+  FunctionalTest& setLevelSetup(LevelSetup* lvlsetup);
+  FunctionalTest& setLevelSetup_defined(bool lvlsetup_defined);
+  
   string testName() { return Base::testName(); }
 
  protected:

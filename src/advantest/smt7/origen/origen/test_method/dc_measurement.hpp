@@ -4,6 +4,7 @@
 #include "base.hpp"
 #include "mapi.hpp"
 #include "rdi.hpp"
+#include "LevelSetup.h"
 
 using namespace std;
 
@@ -24,6 +25,8 @@ class DCMeasurement : public Base {
   double _iRange;
   int _processResults;
   int _badc;
+  LevelSetup* _lvlSet;
+  bool _lvlSetup_defined;
 
  public:
   DCMeasurement();
@@ -41,7 +44,9 @@ class DCMeasurement : public Base {
   DCMeasurement& iRange(double v);
   DCMeasurement& processResults(int v);
   DCMeasurement& badc(int v);
-
+  DCMeasurement& setLevelSetup(LevelSetup* lvlsetup);
+  DCMeasurement& setLevelSetup_defined(bool lvlsetup_defined);
+  
  protected:
   typedef DCMeasurement super;
   DCMeasurement& getThis();

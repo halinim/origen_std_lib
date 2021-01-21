@@ -12,6 +12,7 @@ FunctionalTest::FunctionalTest() {
   bitPerWord(1);
   pattern("");
   testName("");
+  setLevelSetup_defined(false);
 }
 
 FunctionalTest::~FunctionalTest() {}
@@ -59,6 +60,15 @@ FunctionalTest& FunctionalTest::testName(string v) {
   return *this;
 }
 
+FunctionalTest& FunctionalTest::setLevelSetup(LevelSetup* lvlsetup){
+	_lvlSet = lvlsetup;
+	setLevelSetup_defined(true);
+	return *this;
+}
+FunctionalTest& FunctionalTest::setLevelSetup_defined(bool lvlSetup_defined){
+	_lvlSetup_defined = lvlSetup_defined;
+	return *this;
+}
 // All test methods must implement this function
 FunctionalTest& FunctionalTest::getThis() { return *this; }
 
@@ -80,6 +90,16 @@ void FunctionalTest::_execute() {
   }
 
   RDI_BEGIN();
+
+  if(_lvlSetup_defined){
+	    if (_port.empty()) {
+	    	(*_lvlSet).apply(LevelSetup::ChangeOnly, 100 us);
+	    }
+	  // ***** [HL] portname unknown to NVM and differs for each product !!
+      else{
+	    	(*_lvlSet).port("P_DCSet").apply(LevelSetup::ChangeOnly, 100 us);
+	    }
+  }
 
   if (_capture) {
     if (_port.empty()) {

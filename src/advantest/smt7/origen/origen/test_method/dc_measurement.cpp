@@ -14,6 +14,7 @@ DCMeasurement::DCMeasurement() {
   processResults(1);
   badc(0);
   port("");
+  setLevelSetup_defined(false);
 }
 
 DCMeasurement::~DCMeasurement() {}
@@ -62,7 +63,16 @@ DCMeasurement& DCMeasurement::badc(int v) {
   _badc = v;
   return *this;
 }
+DCMeasurement& DCMeasurement::setLevelSetup(LevelSetup* lvlsetup){
+	_lvlSet = lvlsetup;
 
+	setLevelSetup_defined(true);
+	return *this;
+}
+DCMeasurement& DCMeasurement::setLevelSetup_defined(bool lvlSetup_defined){
+	_lvlSetup_defined = lvlSetup_defined;
+	return *this;
+}
 // All test methods must implement this function
 DCMeasurement& DCMeasurement::getThis() { return *this; }
 
@@ -114,6 +124,17 @@ void DCMeasurement::_execute() {
 
   RDI_BEGIN();
 
+  if(_lvlSetup_defined){
+	  if (_port.empty()) {
+		  (*_lvlSet).apply(LevelSetup::ChangeOnly, 100 us);
+	  }
+    // ***** [HL] portname unknown to NVM and differs for each product !!
+	  else{
+		  (*_lvlSet).port("P_DCSet").apply(LevelSetup::ChangeOnly, 100 us);
+	  }
+  }
+
+
   if (_port.empty()) {
     rdi.func(suiteName + "f1").label(label).execute();
   } else {
@@ -129,6 +150,7 @@ void DCMeasurement::_execute() {
             .pin(_pin, TA::BADC)
             .measWait(_settlingTime)
             .vMeas()
+            .postWait(100 us)
             .execute();
       } else {
         rdi.port(_port)
@@ -136,6 +158,7 @@ void DCMeasurement::_execute() {
             .pin(_pin, TA::BADC)
             .measWait(_settlingTime)
             .vMeas()
+            .postWait(100 us)
             .execute();
       }
 
@@ -147,7 +170,8 @@ void DCMeasurement::_execute() {
                 .iForce(_forceValue)
                 .measWait(_settlingTime)
                 .relay(TA::ppmuRly_onPPMU_offACDC, TA::ppmuRly_onAC_offDCPPMU)
-                .vMeas();
+                .vMeas()
+                .postWait(100 us);
         filterRDI(prdi);
         prdi.execute();
       } else {
@@ -158,7 +182,8 @@ void DCMeasurement::_execute() {
                 .iForce(_forceValue)
                 .measWait(_settlingTime)
                 .relay(TA::ppmuRly_onPPMU_offACDC, TA::ppmuRly_onAC_offDCPPMU)
-                .vMeas();
+                .vMeas()
+                .postWait(100 us);
         filterRDI(prdi);
         prdi.execute();
       }
